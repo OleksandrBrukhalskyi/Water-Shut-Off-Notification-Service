@@ -1,6 +1,7 @@
 package com.dev.notification_service.controller;
 
 import com.amazonaws.services.sns.AmazonSNSClient;
+import com.amazonaws.services.sns.model.ListTopicsRequest;
 import com.amazonaws.services.sns.model.ListTopicsResult;
 import com.amazonaws.services.sns.model.Topic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ public class SNSController {
 
     @GetMapping("/api/v1/topics")
     public List<Topic> getTopics(){
-        ListTopicsResult listTopicsResult = snsClient.listTopics();
-        List<Topic> topics = listTopicsResult.getTopics();
-        return topics;
+       ListTopicsResult topicsResult = snsClient.listTopics();
+       List<Topic> topics = topicsResult.getTopics();
+       return topics;
     }
 }
