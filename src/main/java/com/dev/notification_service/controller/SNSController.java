@@ -7,6 +7,9 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.*;
+import com.dev.notification_service.services.CreateTopic;
+import com.dev.notification_service.services.DeleteTopic;
+import com.dev.notification_service.services.GetTopics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +23,11 @@ import javax.print.URIException;
 import java.util.List;
 
 @RestController
-public class SNSController {
-    @Value("${aws.awsAccessKeyId:}")
-    private  String accessKey;
-    @Value("${aws.awsSecretAccessKey:}")
-    private  String secretKey;
+public class SNSController implements CreateTopic, GetTopics, DeleteTopic {
 
     @Autowired
     private AmazonSNSClient snsClient;
-
-
-
-
+    @Override
     @GetMapping("/api/v1/topics")
     public List<Topic> getTopics(){
         ListTopicsResult listTopicsResult = snsClient.listTopics();
@@ -44,6 +40,7 @@ public class SNSController {
         }
       return topics;
     }
+    @Override
     @PostMapping("/api/v1/createTopic/")
     public String createTopic(@RequestParam("topicName") String topicName){
         CreateTopicResult result = snsClient.createTopic(topicName);
@@ -63,5 +60,12 @@ public class SNSController {
         snsClient.subscribe(topicArn,"sms",phoneNumber);
 
         return "The phone number "+phoneNumber +" was successfully subscribed to " + topicArn + " using SMS protocol";
+    }
+
+    @Override
+    @DeleteMapping("api/v1/delete")
+    public String deleteTopic(@RequestParam("topicArn") String topicArn) {
+        snsClient.deleteTopic(topicArn);
+        return topicArn + " was successfully deleted!";
     }
 }
