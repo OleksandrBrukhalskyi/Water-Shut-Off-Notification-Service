@@ -6,17 +6,17 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
-import com.amazonaws.services.sns.model.CreateTopicResult;
-import com.amazonaws.services.sns.model.ListTopicsResult;
-import com.amazonaws.services.sns.model.PublishResult;
-import com.amazonaws.services.sns.model.Topic;
+import com.amazonaws.services.sns.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.SnsException;
+import software.amazon.awssdk.services.sns.model.SubscribeRequest;
+import software.amazon.awssdk.services.sns.model.SubscribeResponse;
 
+import javax.print.URIException;
 import java.util.List;
 
 @RestController
@@ -56,6 +56,12 @@ public class SNSController {
                             ){
       snsClient.publish(topicArn,message,subject);
       return "Message sent to " + topicArn;
+    }
+    @PostMapping("/api/v1/subscribe")
+    public String subscribeToTopic(@RequestParam("endpoint") String phoneNumber,
+                                   @RequestParam("topicArn") String topicArn)  {
+        snsClient.subscribe(topicArn,"sms",phoneNumber);
 
+        return "The phone number "+phoneNumber +" was successfully subscribed to " + topicArn + " using SMS protocol";
     }
 }
